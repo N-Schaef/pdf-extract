@@ -34,7 +34,8 @@ pub enum OutputError
 {
     FormatError(std::fmt::Error),
     IoError(std::io::Error),
-    PdfError(lopdf::Error)
+    PdfError(lopdf::Error),
+    InstructionError(String),
 }
 
 impl std::fmt::Display for OutputError
@@ -43,7 +44,8 @@ impl std::fmt::Display for OutputError
         match self {
             OutputError::FormatError(e) => write!(f, "Formating error: {}", e),
             OutputError::IoError(e) => write!(f, "IO error: {}", e),
-            OutputError::PdfError(e) => write!(f, "PDF error: {}", e)
+            OutputError::PdfError(e) => write!(f, "PDF error: {}", e),
+            OutputError::InstructionError(e) => write!(f, "Instruction error: {}", e),
         }
     }
 }
@@ -1508,7 +1510,7 @@ impl<'a> Processor<'a> {
                 }
                 "Tm" => {
                     if operation.operands.len() != 6 {
-                        panic!("Unknown error");
+                        return Err(OutputError::InstructionError("Unexpected operand count".into()));
                     }
                     tlm = Transform2D::row_major(as_num(&operation.operands[0]),
                                                  as_num(&operation.operands[1]),
@@ -1526,7 +1528,7 @@ impl<'a> Processor<'a> {
                    More precisely, this operator performs the following assignments:
                  */
                     if operation.operands.len() != 2 {
-                        panic!("Unknown error");
+                        return Err(OutputError::InstructionError("Unexpected operand count".into()));
                     }
                     let tx = as_num(&operation.operands[0]);
                     let ty = as_num(&operation.operands[1]);
@@ -1543,7 +1545,7 @@ impl<'a> Processor<'a> {
                    As a side effect, this operator sets the leading parameter in the text state.
                  */
                     if operation.operands.len() != 2 {
-                        panic!("Unknown error");
+                        return Err(OutputError::InstructionError("Unexpected operand count".into()));
                     }
                     let tx = as_num(&operation.operands[0]);
                     let ty = as_num(&operation.operands[1]);
