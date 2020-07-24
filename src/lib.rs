@@ -556,7 +556,9 @@ impl<'a> PdfSimpleFont<'a> {
                 width_map.insert((first_char + i) as CharCode, w);
                 i += 1;
             }
-            assert_eq!(first_char + i - 1, last_char);
+            if first_char + i - 1 != last_char {
+                panic!("Unknown error");
+            }
         }
 
         PdfSimpleFont {doc, font, widths: width_map, encoding: encoding_table, default_width: None, unicode_map}
@@ -659,7 +661,9 @@ impl<'a> PdfType3Font<'a> {
             width_map.insert((first_char + i) as CharCode, w);
             i += 1;
         }
-        assert_eq!(first_char + i - 1, last_char);
+        if first_char + i - 1 != last_char {
+            panic!("Unknown error");
+        }
         PdfType3Font {doc, font, widths: width_map, encoding: encoding_table, unicode_map}
     }
 }
@@ -816,7 +820,9 @@ fn get_unicode_map<'a>(doc: &'a Document, font: &'a Dictionary) -> Option<HashMa
             for (&k, v) in cmap.iter() {
                 let mut be: Vec<u16> = Vec::new();
                 let mut i = 0;
-                assert!(v.len() % 2 == 0);
+                if v.len() % 2 != 0 {
+                    panic!("Unknown error");
+                }
                 while i < v.len() {
                     be.push(((v[i] as u16) << 8) | v[i+1] as u16);
                     i += 2;
@@ -840,7 +846,9 @@ fn get_unicode_map<'a>(doc: &'a Document, font: &'a Dictionary) -> Option<HashMa
         None => { }
         Some(&Object::Name(ref name)) => {
             let name = pdf_to_utf8(name);
-            assert!(name == "Identity-H");
+            if name != "Identity-H" {
+                panic!("Unknown error");
+            }
         }
         _ => { panic!("unsupported cmap {:?}", to_unicode)}
     }
@@ -860,7 +868,9 @@ impl<'a> PdfCIDFont<'a> {
             &Object::Name(ref name) => {
                 let name = pdf_to_utf8(name);
                 dlog!("encoding {:?}", name);
-                assert!(name == "Identity-H");
+                if name != "Identity-H" {
+                    panic!("Unknown error");
+                }
             }
             &Object::Stream(ref stream) => {
                 let contents = get_contents(stream);
@@ -1191,7 +1201,9 @@ fn apply_state(gs: &mut GraphicsState, state: &Dictionary) {
             }}
             b"Type" => { match v {
                 &Object::Name(ref name) => {
-                    assert_eq!(name, b"ExtGState")
+                    if name != b"ExtGState" {
+                        panic!("Unknown error");
+                    }
                 }
                 _ => { panic!("unexpected type") }
             }}
@@ -1385,7 +1397,9 @@ impl<'a> Processor<'a> {
                     gs.ts.tm = tlm;
                 }
                 "cm" => {
-                    assert!(operation.operands.len() == 6);
+                    if operation.operands.len() != 6 {
+                        panic!("Unknown error");
+                    }
                     let m = Transform2D::row_major(as_num(&operation.operands[0]),
                                                    as_num(&operation.operands[1]),
                                                    as_num(&operation.operands[2]),
@@ -1493,7 +1507,9 @@ impl<'a> Processor<'a> {
                     gs.ts.rise = as_num(&operation.operands[0]);
                 }
                 "Tm" => {
-                    assert!(operation.operands.len() == 6);
+                    if operation.operands.len() != 6 {
+                        panic!("Unknown error");
+                    }
                     tlm = Transform2D::row_major(as_num(&operation.operands[0]),
                                                  as_num(&operation.operands[1]),
                                                  as_num(&operation.operands[2]),
@@ -1509,7 +1525,9 @@ impl<'a> Processor<'a> {
                    tx and ty are numbers expressed in unscaled text space units.
                    More precisely, this operator performs the following assignments:
                  */
-                    assert!(operation.operands.len() == 2);
+                    if operation.operands.len() != 2 {
+                        panic!("Unknown error");
+                    }
                     let tx = as_num(&operation.operands[0]);
                     let ty = as_num(&operation.operands[1]);
                     dlog!("translation: {} {}", tx, ty);
@@ -1524,7 +1542,9 @@ impl<'a> Processor<'a> {
                     /* Move to the start of the next line, offset from the start of the current line by (tx , ty ).
                    As a side effect, this operator sets the leading parameter in the text state.
                  */
-                    assert!(operation.operands.len() == 2);
+                    if operation.operands.len() != 2 {
+                        panic!("Unknown error");
+                    }
                     let tx = as_num(&operation.operands[0]);
                     let ty = as_num(&operation.operands[1]);
                     dlog!("translation: {} {}", tx, ty);
