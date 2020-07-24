@@ -1400,7 +1400,7 @@ impl<'a> Processor<'a> {
                 }
                 "cm" => {
                     if operation.operands.len() != 6 {
-                        panic!("Unknown error");
+                        return Err(OutputError::InstructionError("Unexpected operand count".into()));
                     }
                     let m = Transform2D::row_major(as_num(&operation.operands[0]),
                                                    as_num(&operation.operands[1]),
